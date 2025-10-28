@@ -1,0 +1,118 @@
+{
+  "analisis_inicial": {
+    "timestamp": "2025-10-28 11:56:29",
+    "existe": true
+  },
+  "contador_actualizaciones": 0,
+  "ultima_actualizacion": "2025-10-28 11:56:29",
+  "timeframes": {
+    "4h": {
+      "precio": 4135.75,
+      "ema21": 4079.250323897559,
+      "ema50": 4021.087723370357,
+      "rsi": 60.732899400060255,
+      "bb_superior": 4268.8820343988855,
+      "bb_media": 4082.6920000000005,
+      "bb_inferior": 3896.5019656011154,
+      "macd_linea": 48.12068165704932,
+      "macd_signal": 54.21973769041623,
+      "macd_histograma": -6.099056033366914,
+      "volumen": 21633.1007,
+      "vwap": 4108.629276890513,
+      "long_count": 4,
+      "short_count": 0,
+      "long_conditions": [
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true
+      ],
+      "short_conditions": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "last_candle_open_time": 1761667200000,
+      "last_candle_close_time": 1761681599999
+    },
+    "1h": {
+      "precio": 4136.32,
+      "ema21": 4123.573020473024,
+      "ema50": 4109.268452716252,
+      "rsi": 58.33661805281823,
+      "bb_superior": 4151.3857774575645,
+      "bb_media": 4113.779500000001,
+      "bb_inferior": 4076.173222542436,
+      "macd_linea": -3.185656902309347,
+      "macd_signal": -4.526633368578142,
+      "macd_histograma": 1.3409764662687946,
+      "volumen": 21633.1442,
+      "vwap": 4113.813522955586,
+      "long_count": 4,
+      "short_count": 0,
+      "long_conditions": [
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true
+      ],
+      "short_conditions": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "last_candle_open_time": 1761667200000,
+      "last_candle_close_time": 1761670799999
+    },
+    "15min": {
+      "precio": 4136.99,
+      "ema21": 4119.842125503551,
+      "ema50": 4120.070937751752,
+      "rsi": 49.38419514065255,
+      "bb_superior": 4167.358671819251,
+      "bb_media": 4123.539999999999,
+      "bb_inferior": 4079.7213281807476,
+      "macd_linea": -0.5680921940474946,
+      "macd_signal": 0.23428230919437001,
+      "macd_histograma": -0.8023745032418645,
+      "volumen": 10095.7988,
+      "vwap": 4114.043271782875,
+      "long_count": 4,
+      "short_count": 2,
+      "long_conditions": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "short_conditions": [
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "last_candle_open_time": 1761669900000,
+      "last_candle_close_time": 1761670799999
+    }
+  }
+}
