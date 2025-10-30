@@ -10,19 +10,11 @@ import os
 from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
-import logging
 
 from src.binance_client import BinanceClient
 from src.indicators import TechnicalIndicators
 from src.evaluator import ConditionEvaluator
 from src.reporter import Reporter
-
-# Configurar logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 
 class TradingAnalysis:
@@ -210,35 +202,24 @@ class TradingAnalysis:
     def option1_initial_analysis(self):
         """OPCIÓN 1: Análisis Inicial (4h, 1h, 15min)"""
         print("\n🔍 Ejecutando Análisis Inicial...")
-        logger.info("========== OPCIÓN 1: ANÁLISIS INICIAL ==========")
         print("Conectando a Binance Futures API...")
-        logger.info("Verificando conexión con Binance Futures API...")
 
         # Verificar conexión
         if not self.client.test_connection():
-            logger.error("❌ Conexión a Binance API fallida")
             print("❌ ERROR: No se pudo conectar a Binance API. Verificar conexión a internet.")
             return
 
-        logger.info("✅ Conexión exitosa")
         print("✅ Conexión exitosa")
 
         try:
             # Analizar los 3 timeframes
             print("\n📊 Analizando timeframes...")
-            logger.info("Iniciando análisis de timeframes")
 
             data = {}
             for interval in ['4h', '1h', '15m']:
                 print(f"  Analizando {interval}...")
-                logger.info(f"Analizando timeframe: {interval}")
                 tf_key = interval.replace('m', 'min')
-                try:
-                    data[tf_key] = self.analyze_timeframe(interval)
-                    logger.info(f"✅ Timeframe {interval} analizado exitosamente")
-                except Exception as e:
-                    logger.error(f"❌ Error al analizar {interval}: {type(e).__name__} - {str(e)}")
-                    raise
+                data[tf_key] = self.analyze_timeframe(interval)
 
             # Generar reporte
             print("\n📝 Generando reporte...")
@@ -292,13 +273,10 @@ class TradingAnalysis:
 
             self.save_state(state)
             print("\n💾 Estado guardado exitosamente")
-            logger.info("✅ Análisis inicial completado exitosamente")
 
         except Exception as e:
-            logger.error(f"❌ ERROR en análisis inicial: {type(e).__name__} - {str(e)}")
-            import traceback
-            logger.debug(traceback.format_exc())
             print(f"\n❌ ERROR: {str(e)}")
+            import traceback
             traceback.print_exc()
 
     def option2_update_analysis(self):
