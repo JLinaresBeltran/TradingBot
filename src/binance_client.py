@@ -7,6 +7,14 @@ import requests
 from datetime import datetime, timezone
 from typing import List, Dict, Any
 import time
+import logging
+
+# Configurar logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 class BinanceClient:
@@ -49,8 +57,11 @@ class BinanceClient:
         max_retries = 3
         retry_delay = 1  # segundos
 
+        logger.info(f"📊 Obteniendo klines - Symbol: {symbol}, Interval: {interval}, Limit: {limit}")
+
         for attempt in range(max_retries):
             try:
+                logger.debug(f"Intento {attempt + 1}/{max_retries}: GET {endpoint}")
                 response = self.session.get(endpoint, params=params, timeout=10)
 
                 # Manejar rate limits
@@ -60,10 +71,13 @@ class BinanceClient:
 
                 response.raise_for_status()
 
+                logger.info(f"✅ Status Code: {response.status_code}")
                 data = response.json()
 
                 if not isinstance(data, list) or len(data) == 0:
                     raise ValueError("Respuesta de API inválida o vacía")
+
+                logger.info(f"✅ Datos recibidos: {len(data)} velas")
 
                 # Convertir datos a formato más manejable
                 klines = []
@@ -83,23 +97,35 @@ class BinanceClient:
                     }
                     klines.append(kline)
 
+                logger.info(f"✅ Klines procesados correctamente: {len(klines)} velas")
                 return klines
 
-            except requests.exceptions.Timeout:
+            except requests.exceptions.Timeout as e:
+                logger.warning(f"⏱️  Timeout en intento {attempt + 1}/{max_retries}: {str(e)}")
                 if attempt < max_retries - 1:
                     time.sleep(retry_delay * (attempt + 1))
                     continue
+                logger.error("❌ Timeout al conectar con Binance API después de reintentos")
                 raise ConnectionError("Timeout al conectar con Binance API")
 
-            except requests.exceptions.ConnectionError:
+            except requests.exceptions.ConnectionError as e:
+                logger.warning(f"🔌 Error de conexión en intento {attempt + 1}/{max_retries}: {str(e)}")
                 if attempt < max_retries - 1:
                     time.sleep(retry_delay * (attempt + 1))
                     continue
+                logger.error("❌ Error de conexión con Binance API después de reintentos")
                 raise ConnectionError("Error de conexión con Binance API. Verificar internet")
 
             except requests.exceptions.RequestException as e:
+                logger.error(f"❌ Error en solicitud a Binance API: {type(e).__name__} - {str(e)}")
                 raise ConnectionError(f"Error en solicitud a Binance API: {str(e)}")
+            except Exception as e:
+                logger.error(f"❌ Error inesperado en get_klines: {type(e).__name__} - {str(e)}")
+                import traceback
+                logger.debug(traceback.format_exc())
+                raise
 
+        logger.error("❌ Máximo número de reintentos alcanzado")
         raise ConnectionError("Máximo número de reintentos alcanzado")
 
     def get_klines_spot(self, symbol: str, interval: str, limit: int = 200) -> List[Dict[str, Any]]:
@@ -131,8 +157,11 @@ class BinanceClient:
         max_retries = 3
         retry_delay = 1  # segundos
 
+        logger.info(f"📊 Obteniendo SPOT klines - Symbol: {symbol}, Interval: {interval}, Limit: {limit}")
+
         for attempt in range(max_retries):
             try:
+                logger.debug(f"Intento {attempt + 1}/{max_retries}: GET {endpoint}")
                 response = self.session.get(endpoint, params=params, timeout=10)
 
                 # Manejar rate limits
@@ -142,7 +171,10 @@ class BinanceClient:
 
                 response.raise_for_status()
 
+                logger.info(f"✅ Status Code: {response.status_code}")
                 klines_data = response.json()
+
+                logger.info(f"✅ Datos SPOT recibidos: {len(klines_data)} velas")
 
                 # Convertir a formato consistente
                 result = []
@@ -161,16 +193,33 @@ class BinanceClient:
                         'taker_buy_quote': float(kline[10])
                     })
 
+                logger.info(f"✅ SPOT Klines procesados correctamente: {len(result)} velas")
                 return result
 
-            except requests.exceptions.HTTPError as e:
+            except requests.exceptions.Timeout as e:
+                logger.warning(f"⏱️  Timeout en intento {attempt + 1}/{max_retries}: {str(e)}")
                 if attempt < max_retries - 1:
                     time.sleep(retry_delay * (attempt + 1))
                     continue
+                logger.error("❌ Timeout al conectar con Binance SPOT API después de reintentos")
+                raise ConnectionError("Timeout al conectar con Binance SPOT API")
+
+            except requests.exceptions.HTTPError as e:
+                logger.warning(f"🌐 HTTP Error en intento {attempt + 1}/{max_retries}: {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay * (attempt + 1))
+                    continue
+                logger.error("❌ Error de conexión con Binance SPOT API después de reintentos")
                 raise ConnectionError("Error de conexión con Binance SPOT API. Verificar internet")
 
             except requests.exceptions.RequestException as e:
+                logger.error(f"❌ Error en solicitud a Binance SPOT API: {type(e).__name__} - {str(e)}")
                 raise ConnectionError(f"Error en solicitud a Binance SPOT API: {str(e)}")
+            except Exception as e:
+                logger.error(f"❌ Error inesperado en get_klines_spot: {type(e).__name__} - {str(e)}")
+                import traceback
+                logger.debug(traceback.format_exc())
+                raise
 
         raise ConnectionError("Máximo número de reintentos alcanzado")
 
@@ -258,7 +307,27 @@ class BinanceClient:
         endpoint = f"{self.BASE_URL}/fapi/v1/ping"
 
         try:
+            logger.info(f"🔗 Intentando conectar a: {endpoint}")
             response = self.session.get(endpoint, timeout=5)
-            return response.status_code == 200
-        except:
+            logger.info(f"✅ Respuesta recibida - Status Code: {response.status_code}")
+            logger.debug(f"Headers: {response.headers}")
+            logger.debug(f"Body: {response.text}")
+
+            if response.status_code == 200:
+                logger.info("✅ Conexión a Binance API exitosa")
+                return True
+            else:
+                logger.error(f"❌ Status code no esperado: {response.status_code}")
+                logger.error(f"Response: {response.text}")
+                return False
+        except requests.exceptions.Timeout as e:
+            logger.error(f"❌ Timeout al conectar con Binance: {str(e)}")
+            return False
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"❌ Error de conexión con Binance: {str(e)}")
+            return False
+        except Exception as e:
+            logger.error(f"❌ Error inesperado en test_connection: {type(e).__name__} - {str(e)}")
+            import traceback
+            logger.debug(traceback.format_exc())
             return False
