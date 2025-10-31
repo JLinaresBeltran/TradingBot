@@ -145,9 +145,10 @@ class ConditionEvaluator:
         Returns:
             String descriptivo del estado
         """
-        current = volume_data['current']
-        avg = volume_data['avg_5']
-        change_pct = volume_data['change_pct']
+        # Usar vela anterior (cerrada) para análisis más confiable
+        previous = volume_data['previous']
+        avg = volume_data['avg_20']
+        change_pct = volume_data['change_pct_previous']
         bullish_candles = volume_data['bullish_candles']
         bearish_candles = volume_data['bearish_candles']
         total_candles = volume_data['total_candles']

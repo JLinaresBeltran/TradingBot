@@ -165,39 +165,51 @@ class TechnicalIndicators:
         return vwap_full
 
     @staticmethod
-    def analyze_volume(df: pd.DataFrame, lookback: int = 5) -> Dict[str, Any]:
+    def analyze_volume(df: pd.DataFrame, lookback: int = 5, use_closed_candle: bool = False) -> Dict[str, Any]:
         """
-        Analiza el volumen actual comparado con el promedio.
+        Analiza el volumen actual y de la vela anterior comparado con el promedio.
 
         Args:
             df: DataFrame con columnas 'volume', 'close', 'open'
             lookback: Número de velas para calcular promedio
+            use_closed_candle: Si True, usa la penúltima vela (última cerrada) en lugar de la última (en progreso)
 
         Returns:
             Diccionario con análisis de volumen
         """
+        # Volumen de la vela actual (última, puede estar en progreso)
         current_volume = df['volume'].iloc[-1]
-        avg_volume = df['volume'].iloc[-lookback-1:-1].mean()
-        avg_volume_20 = df['volume'].iloc[-21:-1].mean() if len(df) >= 21 else avg_volume
 
-        volume_change = ((current_volume - avg_volume) / avg_volume) * 100 if avg_volume > 0 else 0
-        volume_change_20 = ((current_volume - avg_volume_20) / avg_volume_20) * 100 if avg_volume_20 > 0 else 0
+        # Volumen de la vela anterior (penúltima, cerrada)
+        previous_volume = df['volume'].iloc[-2]
 
-        # Analizar si las últimas velas son alcistas o bajistas
+        # Calcular Volume MA(20) - excluyendo la vela actual
+        # Usamos las 20 velas anteriores a la vela actual (desde -21 hasta -1, excluyendo -1)
+        avg_volume_20 = df['volume'].iloc[-21:-1].mean() if len(df) >= 21 else df['volume'].iloc[:-1].mean()
+
+        # Calcular cambios porcentuales
+        volume_change_current = ((current_volume - avg_volume_20) / avg_volume_20) * 100 if avg_volume_20 > 0 else 0
+        volume_change_previous = ((previous_volume - avg_volume_20) / avg_volume_20) * 100 if avg_volume_20 > 0 else 0
+
+        # Analizar si las últimas velas son alcistas o bajistas (excluyendo la actual)
         recent_candles = []
-        for i in range(-min(lookback, len(df)), 0):
-            is_bullish = df['close'].iloc[i] > df['open'].iloc[i]
-            recent_candles.append(is_bullish)
+        start_index = -lookback - 1  # -6 para lookback=5
+        end_index = -1  # Hasta -1 (excluyendo la actual)
+
+        for i in range(start_index, end_index):
+            if abs(i) <= len(df):
+                is_bullish = df['close'].iloc[i] > df['open'].iloc[i]
+                recent_candles.append(is_bullish)
 
         bullish_count = sum(recent_candles)
         bearish_count = len(recent_candles) - bullish_count
 
         return {
             'current': current_volume,
-            'avg_5': avg_volume,
+            'previous': previous_volume,
             'avg_20': avg_volume_20,
-            'change_pct': volume_change,
-            'change_pct_20': volume_change_20,
+            'change_pct_current': volume_change_current,
+            'change_pct_previous': volume_change_previous,
             'bullish_candles': bullish_count,
             'bearish_candles': bearish_count,
             'total_candles': len(recent_candles)
@@ -313,9 +325,13 @@ class TechnicalIndicators:
         source_df_macd = df_spot if df_spot is not None else df
         macd = TechnicalIndicators.calculate_macd(source_df_macd, 12, 26, 9)
 
+        # Usar siempre la última vela (vela actual en progreso) para MACD en tiempo real
+        macd_index = -1
+
         # Volumen - Usa datos de SPOT si están disponibles, sino FUTUROS
         source_df_volume = df_spot if df_spot is not None else df
-        volume_analysis = TechnicalIndicators.analyze_volume(source_df_volume, 5)
+        # Para volumen, si usamos SPOT, necesitamos usar penúltima vela (cerrada)
+        volume_analysis = TechnicalIndicators.analyze_volume(source_df_volume, 20, use_closed_candle=(df_spot is not None))
 
         return {
             'price': current_price,
@@ -325,11 +341,11 @@ class TechnicalIndicators:
             'bb_upper': bb['upper'].iloc[-1],
             'bb_middle': bb['middle'].iloc[-1],
             'bb_lower': bb['lower'].iloc[-1],
-            'macd_line': macd['macd'].iloc[-1],
-            'macd_signal': macd['signal'].iloc[-1],
-            'macd_histogram': macd['histogram'].iloc[-1],
-            'macd_histogram_prev': macd['histogram'].iloc[-2] if len(macd['histogram']) >= 2 else 0,
-            'macd_histogram_prev2': macd['histogram'].iloc[-3] if len(macd['histogram']) >= 3 else 0,
+            'macd_line': macd['macd'].iloc[macd_index],
+            'macd_signal': macd['signal'].iloc[macd_index],
+            'macd_histogram': macd['histogram'].iloc[macd_index],
+            'macd_histogram_prev': macd['histogram'].iloc[macd_index - 1] if len(macd['histogram']) >= abs(macd_index) + 1 else 0,
+            'macd_histogram_prev2': macd['histogram'].iloc[macd_index - 2] if len(macd['histogram']) >= abs(macd_index) + 2 else 0,
             'vwap': vwap.iloc[-1],
             'volume': volume_analysis
         }

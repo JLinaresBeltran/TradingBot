@@ -40,6 +40,10 @@ pip install -r requirements.txt
 ### Ejecutar el Script
 
 ```bash
+# En macOS/Linux:
+python3 analisis_tecnico.py
+
+# En Windows:
 python analisis_tecnico.py
 ```
 
@@ -229,6 +233,3 @@ Para reportar bugs o solicitar features, crear un issue en el repositorio del pr
 
 Este proyecto es de uso personal y educativo.
 
-## Disclaimer
-
-Este software es solo para fines informativos y educativos. No constituye asesoramiento financiero. El trading de criptomonedas conlleva riesgos significativos. Use bajo su propia responsabilidad.

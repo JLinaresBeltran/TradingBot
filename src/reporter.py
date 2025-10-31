@@ -233,16 +233,17 @@ INDICADORES
   Distancia a banda superior: {self.format_percentage(dist_bb_upper)}
   Distancia a banda inferior: {self.format_percentage(dist_bb_lower)}
 
-• MACD:
+• MACD (vela actual en progreso):
   Línea: {self.format_number(indicators['macd_line'], 4)} | Señal: {self.format_number(indicators['macd_signal'], 4)} | Histograma: {self.format_number(indicators['macd_histogram'], 4)}
   Estado Línea: {evaluations['macd_line_state']}
   Estado Histograma: {evaluations['macd_hist_state']}
   Cambio histograma últimas 3 velas: {data.get('macd_trend', 'N/A')}
 
 • Volumen:
-  Actual: {self.format_volume(indicators['volume']['current'])} | Promedio 5 velas: {self.format_volume(indicators['volume']['avg_5'])} | Cambio: {self.format_percentage(indicators['volume']['change_pct'])}
+  Vela anterior (cerrada): {self.format_volume(indicators['volume']['previous'])} | Cambio: {self.format_percentage(indicators['volume']['change_pct_previous'])}
+  Vela actual (en progreso): {self.format_volume(indicators['volume']['current'])} | Cambio: {self.format_percentage(indicators['volume']['change_pct_current'])}
+  Volume MA(20): {self.format_volume(indicators['volume']['avg_20'])}
   Estado: {evaluations['volume_state']}
-  Comparación con promedio 20 velas: {self.format_percentage(indicators['volume']['change_pct_20'])}
 
 • VWAP: {self.format_number(indicators['vwap'])}
   Estado: {evaluations['vwap_state']}
@@ -301,13 +302,15 @@ INDICADORES:
   Superior: {self.format_number(indicators['bb_upper'])} | Media: {self.format_number(indicators['bb_middle'])} | Inferior: {self.format_number(indicators['bb_lower'])}
   Estado: {evaluations['bb_state']}
 
-• MACD:
+• MACD (vela actual en progreso):
   Línea: {self.format_number(indicators['macd_line'], 4)} | Señal: {self.format_number(indicators['macd_signal'], 4)} | Histograma: {self.format_number(indicators['macd_histogram'], 4)}
   Estado Línea: {evaluations['macd_line_state']}
   Estado Histograma: {evaluations['macd_hist_state']}
 
 • Volumen:
-  Actual: {self.format_volume(indicators['volume']['current'])} | Promedio 5 velas: {self.format_volume(indicators['volume']['avg_5'])} | Cambio: {self.format_percentage(indicators['volume']['change_pct'])}
+  Vela anterior (cerrada): {self.format_volume(indicators['volume']['previous'])} | Cambio: {self.format_percentage(indicators['volume']['change_pct_previous'])}
+  Vela actual (en progreso): {self.format_volume(indicators['volume']['current'])} | Cambio: {self.format_percentage(indicators['volume']['change_pct_current'])}
+  Volume MA(20): {self.format_volume(indicators['volume']['avg_20'])}
   Estado: {evaluations['volume_state']}
 
 • VWAP: {self.format_number(indicators['vwap'])} | Precio: {self.format_number(indicators['price'])}
