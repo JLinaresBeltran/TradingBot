@@ -108,6 +108,98 @@ class TechnicalIndicators:
         }
 
     @staticmethod
+    def calculate_atr(df: pd.DataFrame, period: int = 14) -> pd.Series:
+        """
+        Calcula ATR (Average True Range) usando el método de Wilder.
+
+        Args:
+            df: DataFrame con columnas 'high', 'low', 'close'
+            period: Período para ATR (default 14)
+
+        Returns:
+            Series con valores ATR
+        """
+        high = df['high']
+        low = df['low']
+        close = df['close']
+
+        # True Range components
+        tr1 = high - low
+        tr2 = abs(high - close.shift(1))
+        tr3 = abs(low - close.shift(1))
+
+        # True Range es el máximo de los tres
+        tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+
+        # ATR es la media móvil del True Range usando método de Wilder
+        # Wilder usa EMA suavizada con alpha = 1/period
+        atr = tr.ewm(alpha=1/period, adjust=False).mean()
+
+        return atr
+
+    @staticmethod
+    def calculate_sl_tp_with_atr(price: float, atr: float, direction: str = 'LONG') -> Dict[str, Any]:
+        """
+        Calcula Stop Loss y Take Profit basados en ATR con reglas de seguridad.
+
+        Lógica:
+        1. Calcula SL base: (ATR * 2.0) / Precio * 100 = Porcentaje_SL_Base
+        2. Aplica reglas de seguridad (límites 1.5% - 3.0%)
+        3. Calcula TPs con ratios fijos: TP1 = SL * 1.5, TP2 = SL * 2.25
+
+        Args:
+            price: Precio actual
+            atr: Valor ATR actual
+            direction: 'LONG' o 'SHORT'
+
+        Returns:
+            Diccionario con niveles de precio, porcentajes y risk/reward
+        """
+        # Paso 1: Calcular porcentaje SL base
+        sl_base_distance = atr * 2.0
+        porcentaje_sl_base = (sl_base_distance / price) * 100
+
+        # Paso 2: Aplicar reglas de seguridad
+        limite_aplicado = None
+        if porcentaje_sl_base > 3.0:
+            porcentaje_sl_final = 3.0
+            limite_aplicado = "MÁXIMO (3.0%)"
+        elif porcentaje_sl_base < 1.5:
+            porcentaje_sl_final = 1.5
+            limite_aplicado = "MÍNIMO (1.5%)"
+        else:
+            porcentaje_sl_final = porcentaje_sl_base
+            limite_aplicado = None
+
+        # Paso 3: Calcular porcentajes de TPs con ratios fijos
+        porcentaje_tp1 = porcentaje_sl_final * 1.5
+        porcentaje_tp2 = porcentaje_sl_final * 2.25
+
+        # Paso 4: Convertir a precios concretos
+        if direction == 'LONG':
+            sl = price - (price * porcentaje_sl_final / 100)
+            tp1 = price + (price * porcentaje_tp1 / 100)
+            tp2 = price + (price * porcentaje_tp2 / 100)
+        else:  # SHORT
+            sl = price + (price * porcentaje_sl_final / 100)
+            tp1 = price - (price * porcentaje_tp1 / 100)
+            tp2 = price - (price * porcentaje_tp2 / 100)
+
+        return {
+            'sl': sl,
+            'tp1': tp1,
+            'tp2': tp2,
+            'sl_pct': porcentaje_sl_final,
+            'tp1_pct': porcentaje_tp1,
+            'tp2_pct': porcentaje_tp2,
+            'sl_base_pct': porcentaje_sl_base,
+            'limite_aplicado': limite_aplicado,
+            'risk_reward_tp1': 1.5,
+            'risk_reward_tp2': 2.25,
+            'atr_value': atr
+        }
+
+    @staticmethod
     def calculate_vwap(df: pd.DataFrame) -> pd.Series:
         """
         Calcula VWAP (Volume Weighted Average Price) de sesión.
@@ -321,6 +413,9 @@ class TechnicalIndicators:
         # VWAP - Usa datos de FUTUROS
         vwap = TechnicalIndicators.calculate_vwap(df)
 
+        # ATR - Usa datos de FUTUROS
+        atr = TechnicalIndicators.calculate_atr(df, 14)
+
         # MACD - Usa datos de SPOT si están disponibles, sino FUTUROS
         source_df_macd = df_spot if df_spot is not None else df
         macd = TechnicalIndicators.calculate_macd(source_df_macd, 12, 26, 9)
@@ -347,5 +442,6 @@ class TechnicalIndicators:
             'macd_histogram_prev': macd['histogram'].iloc[macd_index - 1] if len(macd['histogram']) >= abs(macd_index) + 1 else 0,
             'macd_histogram_prev2': macd['histogram'].iloc[macd_index - 2] if len(macd['histogram']) >= abs(macd_index) + 2 else 0,
             'vwap': vwap.iloc[-1],
-            'volume': volume_analysis
+            'volume': volume_analysis,
+            'atr': atr.iloc[-1]
         }

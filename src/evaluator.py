@@ -3,8 +3,9 @@ Evaluador de condiciones LONG y SHORT según criterios específicos.
 Compara estados entre actualizaciones para detectar cambios.
 """
 
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 import pandas as pd
+from .indicators import TechnicalIndicators
 
 
 class ConditionEvaluator:
@@ -184,12 +185,13 @@ class ConditionEvaluator:
             return "Precio bajo VWAP"
 
     @staticmethod
-    def evaluate_long_conditions(indicators: Dict[str, Any], df: pd.DataFrame) -> Tuple[List[bool], int]:
+    def evaluate_long_conditions(indicators: Dict[str, Any], df: pd.DataFrame) -> Tuple[List[bool], int, Optional[Dict[str, Any]]]:
         """
         Evalúa las 7 condiciones para LONG.
 
         Returns:
-            Tupla (lista_de_condiciones, count_cumplidas)
+            Tupla (lista_de_condiciones, count_cumplidas, sl_tp_levels)
+            sl_tp_levels es None si count < 5, o dict con niveles si count >= 5
         """
         conditions = []
 
@@ -237,15 +239,26 @@ class ConditionEvaluator:
         conditions.append(cond7)
 
         count = sum(conditions)
-        return conditions, count
+
+        # Calcular SL/TP solo si hay señal válida (>= 5 condiciones)
+        sl_tp_levels = None
+        if count >= 5 and 'atr' in indicators:
+            sl_tp_levels = TechnicalIndicators.calculate_sl_tp_with_atr(
+                price=indicators['price'],
+                atr=indicators['atr'],
+                direction='LONG'
+            )
+
+        return conditions, count, sl_tp_levels
 
     @staticmethod
-    def evaluate_short_conditions(indicators: Dict[str, Any], df: pd.DataFrame) -> Tuple[List[bool], int]:
+    def evaluate_short_conditions(indicators: Dict[str, Any], df: pd.DataFrame) -> Tuple[List[bool], int, Optional[Dict[str, Any]]]:
         """
         Evalúa las 7 condiciones para SHORT.
 
         Returns:
-            Tupla (lista_de_condiciones, count_cumplidas)
+            Tupla (lista_de_condiciones, count_cumplidas, sl_tp_levels)
+            sl_tp_levels es None si count < 5, o dict con niveles si count >= 5
         """
         conditions = []
 
@@ -293,7 +306,17 @@ class ConditionEvaluator:
         conditions.append(cond7)
 
         count = sum(conditions)
-        return conditions, count
+
+        # Calcular SL/TP solo si hay señal válida (>= 5 condiciones)
+        sl_tp_levels = None
+        if count >= 5 and 'atr' in indicators:
+            sl_tp_levels = TechnicalIndicators.calculate_sl_tp_with_atr(
+                price=indicators['price'],
+                atr=indicators['atr'],
+                direction='SHORT'
+            )
+
+        return conditions, count, sl_tp_levels
 
     @staticmethod
     def detect_changes(old_state: Dict[str, Any], new_state: Dict[str, Any],

@@ -1,25 +1,27 @@
 # Análisis Técnico ETHUSDT Futuros Binance
 
-Script en Python para análisis técnico automatizado de ETHUSDT en Binance Futures utilizando 7 indicadores técnicos.
+Script en Python para análisis técnico automatizado de ETHUSDT en Binance Futures utilizando 7 indicadores técnicos con gestión de riesgo automática.
 
 ## Características
 
 - **Análisis Inicial**: Evalúa 3 timeframes (4h, 1h, 15min) con datos completos
-- **Actualización Continua**: Monitoreo cada 15 minutos detectando cambios
+- **Actualización Inteligente**: Solo actualiza timeframes con velas cerradas (optimizado)
 - **Timing de Entrada**: Análisis detallado en timeframe de 5 minutos
-- **7 Indicadores Técnicos**: EMA, RSI, Bandas de Bollinger, MACD, Volumen, VWAP
-- **Datos en Tiempo Real**: Incluye velas en progreso hasta el momento exacto de ejecución
+- **7 Indicadores Técnicos**: EMA, RSI, Bandas de Bollinger, MACD, Volumen, VWAP, ATR
+- **Gestión de Riesgo ATR**: Cálculo automático de SL y 3 niveles de TP cuando hay señal válida (≥5/7 condiciones)
+- **Datos Híbridos**: MACD y Volumen de SPOT, resto de indicadores de FUTUROS
 - **Reportes Automatizados**: Guarda análisis en archivos de texto con timestamp
-- **Sin Interpretaciones**: Solo presenta datos procesados y clasificados
+- **Optimizado para Memoria**: Límite de 50 velas para máxima eficiencia
 
 ## Indicadores Utilizados
 
 1. **EMA 21 y EMA 50** - Tendencia a corto y medio plazo
 2. **RSI 14** - Momentum y zonas de sobrecompra/sobreventa
 3. **Bandas de Bollinger (20,2)** - Volatilidad y extremos
-4. **MACD (12,26,9)** - Cambios de momentum
-5. **Volumen** - Confirmación de movimientos
+4. **MACD (12,26,9)** - Cambios de momentum (datos SPOT)
+5. **Volumen** - Confirmación de movimientos (datos SPOT)
 6. **VWAP** - Precio promedio ponderado por volumen
+7. **ATR 14** - Gestión de riesgo y volatilidad
 
 ## Requisitos
 
@@ -30,7 +32,15 @@ Script en Python para análisis técnico automatizado de ETHUSDT en Binance Futu
 
 1. Clonar o descargar el repositorio
 
-2. Instalar dependencias:
+2. Crear entorno virtual (recomendado):
+```bash
+python3 -m venv venv
+source venv/bin/activate  # En macOS/Linux
+# o
+venv\Scripts\activate  # En Windows
+```
+
+3. Instalar dependencias:
 ```bash
 pip install -r requirements.txt
 ```
@@ -40,11 +50,15 @@ pip install -r requirements.txt
 ### Ejecutar el Script
 
 ```bash
-# En macOS/Linux:
-python3 analisis_tecnico.py
+# Activar entorno virtual primero
+source venv/bin/activate  # En macOS/Linux
+# o
+venv\Scripts\activate  # En Windows
 
-# En Windows:
-python analisis_tecnico.py
+# Ejecutar script
+python3 analisis_tecnico.py  # En macOS/Linux
+# o
+python analisis_tecnico.py  # En Windows
 ```
 
 ### Menú Principal
@@ -84,15 +98,17 @@ Seleccione una opción:
 **Requisito**: Debe existir un análisis inicial previo (Opción 1)
 
 **Qué hace**:
-- Re-analiza los 3 timeframes (4h, 1h, 15min)
+- Verifica qué timeframes tienen velas cerradas
+- **Solo actualiza timeframes con velas nuevas** (optimizado para eficiencia)
 - Compara con el estado anterior
 - Detecta cambios en indicadores y condiciones
 - Actualiza el archivo `estado.json`
 - Genera reporte en `reportes/actualizacion_N_YYYYMMDD_HHMMSS.txt`
 
 **Salida**:
-- **Si hay cambios**: Muestra solo lo que cambió con formato "antes → después"
-- **Sin cambios**: Mensaje breve con estado actual resumido
+- **Timeframes actualizados**: Muestra cambios detectados con formato "antes → después"
+- **Timeframes omitidos**: Indica cuáles no se actualizaron (vela en progreso)
+- **Gestión de Riesgo**: Si hay señal válida (≥5/7 condiciones), muestra SL y 3 TP basados en ATR
 
 ### Opción 3: Análisis 5 Minutos
 
@@ -110,6 +126,7 @@ Seleccione una opción:
 - Distancias porcentuales a EMAs, BBs y VWAP
 - Momentum inmediato de corto plazo
 - Evaluación completa de condiciones LONG/SHORT
+- **Gestión de Riesgo**: Si hay señal válida (≥5/7 condiciones), muestra SL y 3 TP basados en ATR
 
 ## Criterios de Evaluación
 
@@ -132,6 +149,24 @@ Seleccione una opción:
 5. ✅ MACD línea bajo señal + histograma decreciente rojo
 6. ✅ Volumen creciente en velas bajistas
 7. ✅ Precio bajo VWAP
+
+### Gestión de Riesgo (ATR)
+
+Cuando hay **señal válida (≥5/7 condiciones)**, el script calcula automáticamente:
+
+**Para LONG:**
+- **SL (Stop Loss)**: Precio - (1.5 × ATR)
+- **TP1 (Take Profit 1)**: Precio + (1.0 × ATR) - Risk/Reward 1:0.67
+- **TP2 (Take Profit 2)**: Precio + (2.0 × ATR) - Risk/Reward 1:1.33
+- **TP3 (Take Profit 3)**: Precio + (3.0 × ATR) - Risk/Reward 1:2.00
+
+**Para SHORT:**
+- **SL (Stop Loss)**: Precio + (1.5 × ATR)
+- **TP1 (Take Profit 1)**: Precio - (1.0 × ATR) - Risk/Reward 1:0.67
+- **TP2 (Take Profit 2)**: Precio - (2.0 × ATR) - Risk/Reward 1:1.33
+- **TP3 (Take Profit 3)**: Precio - (3.0 × ATR) - Risk/Reward 1:2.00
+
+El ATR se calcula con período 14 y se adapta a la volatilidad actual del mercado.
 
 ## Estructura del Proyecto
 
@@ -157,11 +192,13 @@ TradingBot/
 ## Archivos Generados
 
 ### estado.json
-Archivo que mantiene el estado del análisis:
+Archivo que mantiene el estado del análisis (optimizado, ~3KB):
 - Timestamp del análisis inicial
 - Contador de actualizaciones
-- Valores de todos los indicadores por timeframe
+- Valores de todos los indicadores por timeframe (incluye ATR)
 - Condiciones LONG/SHORT cumplidas
+- SL/TP calculados para señales válidas
+- Timestamps de última vela cerrada por timeframe
 
 ### Reportes (.txt)
 Archivos de texto con el análisis formateado:
@@ -180,12 +217,14 @@ Archivos de texto con el análisis formateado:
    - Revisar cambios detectados
 
 3. **Identificación de oportunidad**:
-   - Cuando timeframes mayores muestren confluencia (5+/7 condiciones)
+   - Cuando timeframes mayores muestren confluencia (≥5/7 condiciones)
+   - El script mostrará automáticamente SL y 3 niveles de TP
    - Ejecutar Opción 3 para timing preciso
 
 4. **Entrada al mercado**:
    - Usar Opción 3 para confirmar momentum de corto plazo
-   - Determinar punto exacto de entrada
+   - Verificar que también tenga ≥5/7 condiciones para confirmar gestión de riesgo
+   - Determinar punto exacto de entrada usando niveles calculados
 
 5. **Seguimiento**:
    - Continuar con Opción 2 para monitoreo
@@ -207,6 +246,21 @@ Archivos de texto con el análisis formateado:
 
 **El análisis y toma de decisiones es responsabilidad del usuario.**
 
+## Optimizaciones de Rendimiento
+
+El script está optimizado para **máxima eficiencia y mínimo uso de memoria**:
+
+1. **Límite de velas**: Solo solicita 50 velas (suficientes para todos los indicadores)
+2. **Actualización inteligente**: Solo actualiza timeframes con velas cerradas
+3. **Estado compacto**: archivo estado.json optimizado (~3KB vs MB anteriormente)
+4. **Verificación previa**: Revisa velas antes de hacer análisis completo
+
+Estos cambios permiten:
+- ✅ Ejecutar sin problemas de memoria
+- ✅ Respuestas más rápidas de la API
+- ✅ Menor consumo de recursos
+- ✅ Precisión 100% mantenida (50 velas son suficientes para EMA50)
+
 ## Manejo de Errores
 
 El script maneja automáticamente:
@@ -216,20 +270,20 @@ El script maneja automáticamente:
 - Validación de datos insuficientes
 - Errores en cálculos de indicadores
 
-## API de Binance
+## Fuentes de Datos
 
-Este script utiliza la **API pública de Binance Futures** que:
-- No requiere autenticación
-- No requiere API keys
-- Solo obtiene datos de mercado
-- No realiza operaciones de trading
-- Tiene rate limits estándar
+El script utiliza un enfoque **híbrido** para máxima precisión:
 
-## Soporte y Contacto
+### Binance Futures (mayoría de indicadores)
+- EMA 21 y EMA 50
+- RSI 14
+- Bandas de Bollinger
+- VWAP
+- ATR 14
+- Precio actual
 
-Para reportar bugs o solicitar features, crear un issue en el repositorio del proyecto.
+### Binance Spot (MACD y Volumen)
+- MACD (12,26,9) - Usa datos SPOT para mayor precisión
+- Volumen - Usa datos SPOT para análisis más confiable
 
-## Licencia
-
-Este proyecto es de uso personal y educativo.
-
+**Nota**: Ambas APIs son públicas, no requieren autenticación ni API keys, y solo obtienen datos de mercado (sin realizar operaciones de trading).

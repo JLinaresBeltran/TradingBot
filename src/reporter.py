@@ -161,15 +161,21 @@ ESTADO ACTUAL (TIMEFRAMES ACTUALIZADOS)
                 tf_data = data[tf_name]
                 candle_time = tf_data['candle_time']
                 completion = tf_data['candle_completion']
+                evaluations = tf_data['evaluations']
 
-                long_count = tf_data['evaluations']['long_count']
-                short_count = tf_data['evaluations']['short_count']
+                long_count = evaluations['long_count']
+                short_count = evaluations['short_count']
 
                 report += f"""TIMEFRAME {tf_name.upper()}:
 Vela: {candle_time} ({completion}% completada)
 LONG: {long_count}/7 | SHORT: {short_count}/7
 
 """
+                # Agregar sección de gestión de riesgo si hay señal válida
+                if long_count >= 5 and 'sl_tp_long' in evaluations and evaluations['sl_tp_long']:
+                    report += self._format_risk_management_section(evaluations['sl_tp_long'], 'LONG')
+                elif short_count >= 5 and 'sl_tp_short' in evaluations and evaluations['sl_tp_short']:
+                    report += self._format_risk_management_section(evaluations['sl_tp_short'], 'SHORT')
 
         return report
 
@@ -249,6 +255,8 @@ INDICADORES
   Estado: {evaluations['vwap_state']}
   Distancia precio-VWAP: {self.format_percentage(dist_vwap)}
 
+• ATR 14: {self.format_number(indicators['atr'], 4)}
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EVALUACIÓN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -267,6 +275,12 @@ SHORT: {evaluations['short_count']}/7 condiciones cumplidas
         for i, condition in enumerate(evaluations['short_conditions']):
             symbol = "✅" if condition else "❌"
             report += f"  {symbol} {self.CONDITION_LABELS_SHORT[i]}\n"
+
+        # Agregar sección de gestión de riesgo si hay señal válida
+        if evaluations['long_count'] >= 5 and 'sl_tp_long' in evaluations and evaluations['sl_tp_long']:
+            report += self._format_risk_management_section(evaluations['sl_tp_long'], 'LONG')
+        elif evaluations['short_count'] >= 5 and 'sl_tp_short' in evaluations and evaluations['sl_tp_short']:
+            report += self._format_risk_management_section(evaluations['sl_tp_short'], 'SHORT')
 
         report += f"""
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -316,6 +330,8 @@ INDICADORES:
 • VWAP: {self.format_number(indicators['vwap'])} | Precio: {self.format_number(indicators['price'])}
   Estado: {evaluations['vwap_state']}
 
+• ATR 14: {self.format_number(indicators['atr'], 4)}
+
 EVALUACIÓN:
 LONG: {evaluations['long_count']}/7 condiciones cumplidas
 """
@@ -331,6 +347,12 @@ SHORT: {evaluations['short_count']}/7 condiciones cumplidas
         for i, condition in enumerate(evaluations['short_conditions']):
             symbol = "✅" if condition else "❌"
             section += f"  {symbol} {self.CONDITION_LABELS_SHORT[i]}\n"
+
+        # Agregar sección de gestión de riesgo si hay señal válida
+        if evaluations['long_count'] >= 5 and 'sl_tp_long' in evaluations and evaluations['sl_tp_long']:
+            section += self._format_risk_management_section(evaluations['sl_tp_long'], 'LONG')
+        elif evaluations['short_count'] >= 5 and 'sl_tp_short' in evaluations and evaluations['sl_tp_short']:
+            section += self._format_risk_management_section(evaluations['sl_tp_short'], 'SHORT')
 
         section += "\n"
 
@@ -385,6 +407,40 @@ Precio: {self.format_number(current_data['indicators']['price'])}
                     arrow = "✅→❌" if old_val and not new_val else "❌→✅"
                     section += f"  {arrow} {self.CONDITION_LABELS_SHORT[idx]}\n"
             section += "\n"
+
+        return section
+
+    def _format_risk_management_section(self, sl_tp: Dict[str, Any], direction: str) -> str:
+        """
+        Formatea la sección de gestión de riesgo con niveles de SL/TP.
+
+        Args:
+            sl_tp: Diccionario con niveles de SL/TP calculados
+            direction: 'LONG' o 'SHORT'
+
+        Returns:
+            String con la sección formateada
+        """
+        section = f"""
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GESTIÓN DE RIESGO - SEÑAL {direction}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Basado en ATR (14): {self.format_number(sl_tp['atr_value'], 4)}
+"""
+
+        # Mostrar si se aplicó límite de seguridad
+        if sl_tp['limite_aplicado']:
+            section += f"⚠️  Límite aplicado: {sl_tp['limite_aplicado']}\n"
+            section += f"   (SL base calculado: {self.format_number(sl_tp['sl_base_pct'], 2)}% → ajustado a {self.format_number(sl_tp['sl_pct'], 2)}%)\n\n"
+
+        section += f"""Stop Loss:     {self.format_number(sl_tp['sl'])}  ({self.format_number(sl_tp['sl_pct'], 2)}%)
+Take Profit 1: {self.format_number(sl_tp['tp1'])}  ({self.format_number(sl_tp['tp1_pct'], 2)}%) - Cerrar 70% posición
+Take Profit 2: {self.format_number(sl_tp['tp2'])}  ({self.format_number(sl_tp['tp2_pct'], 2)}%) - Cerrar 30% posición
+
+Risk/Reward Ratios:
+• TP1: 1:{self.format_number(sl_tp['risk_reward_tp1'], 2)}
+• TP2: 1:{self.format_number(sl_tp['risk_reward_tp2'], 2)}
+"""
 
         return section
 

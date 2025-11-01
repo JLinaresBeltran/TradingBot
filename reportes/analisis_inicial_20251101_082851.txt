@@ -1,5 +1,5 @@
 === ANÁLISIS INICIAL ETHUSDT FUTUROS ===
-Timestamp: 2025-10-31 06:30:23
+Timestamp: 2025-11-01 08:28:51
 
 ℹ️  Fuentes de datos:
   • Precio, EMA, RSI, Bandas de Bollinger, VWAP: FUTUROS
@@ -8,150 +8,156 @@ Timestamp: 2025-10-31 06:30:23
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TIMEFRAME 4H
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Vela actual: 08:00-11:59 (EN PROGRESO - 87.7% completada)
+Vela actual: 12:00-15:59 (EN PROGRESO - 37.0% completada)
 
 INDICADORES:
-• EMA 21: 3906.78 | EMA 50: 3951.39 | Precio: 3833.78
+• EMA 21: 3889.15 | EMA 50: 3933.52 | Precio: 3872.21
   Estado: Precio bajo EMA 21 y EMA 50
   Cruce: EMA 21 bajo EMA 50 (death cross)
 
-• RSI 14: 41.02
-  Estado: RSI 35-45 (zona neutral baja)
+• RSI 14: 46.01
+  Estado: RSI entre 45-65 (momentum alcista sin sobrecompra)
 
 • Bandas de Bollinger:
-  Superior: 4166.12 | Media: 3930.92 | Inferior: 3695.73
+  Superior: 4005.15 | Media: 3867.99 | Inferior: 3730.84
   Estado: Precio en zona media
 
 • MACD (vela actual en progreso):
-  Línea: -60.0262 | Señal: -46.2199 | Histograma: -13.8062
-  Estado Línea: MACD línea bajo señal
-  Estado Histograma: Histograma creciente rojo
+  Línea: -34.4586 | Señal: -42.9956 | Histograma: 8.5371
+  Estado Línea: MACD línea sobre señal
+  Estado Histograma: Histograma creciente verde (positivo)
 
 • Volumen:
-  Vela anterior (cerrada): 56,051 | Cambio: -30.13%
-  Vela actual (en progreso): 33,092 | Cambio: -58.75%
-  Volume MA(20): 80,216
+  Vela anterior (cerrada): 25,845 | Cambio: -66.10%
+  Vela actual (en progreso): 8,011 | Cambio: -89.49%
+  Volume MA(20): 76,242
   Estado: Volumen decreciente
 
-• VWAP: 3834.16 | Precio: 3833.78
-  Estado: Precio bajo VWAP
+• VWAP: 3862.08 | Precio: 3872.21
+  Estado: Precio sobre VWAP
+
+• ATR 14: 64.0581
 
 EVALUACIÓN:
-LONG: 0/7 condiciones cumplidas
+LONG: 3/7 condiciones cumplidas
   ❌ Precio sobre EMA 21 y EMA 50
   ❌ EMA 21 sobre EMA 50
-  ❌ RSI entre 45-65
+  ✅ RSI entre 45-65
   ❌ Precio rebotando BB inferior o rompiendo BB superior
-  ❌ MACD línea sobre señal + histograma creciente verde
+  ✅ MACD línea sobre señal + histograma creciente verde
   ❌ Volumen creciente en velas alcistas
-  ❌ Precio sobre VWAP
+  ✅ Precio sobre VWAP
 
-SHORT: 4/7 condiciones cumplidas
+SHORT: 3/7 condiciones cumplidas
   ✅ Precio bajo EMA 21 y EMA 50
   ✅ EMA 21 bajo EMA 50
   ✅ RSI entre 35-55
   ❌ Precio rechazando BB superior o rompiendo BB inferior
   ❌ MACD línea bajo señal + histograma decreciente rojo
   ❌ Volumen creciente en velas bajistas
-  ✅ Precio bajo VWAP
+  ❌ Precio bajo VWAP
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TIMEFRAME 1H
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Vela actual: 11:00-11:59 (EN PROGRESO - 50.6% completada)
+Vela actual: 13:00-13:59 (EN PROGRESO - 48.1% completada)
 
 INDICADORES:
-• EMA 21: 3831.84 | EMA 50: 3874.24 | Precio: 3833.78
-  Estado: Precio entre EMAs
-  Cruce: EMA 21 bajo EMA 50 (death cross)
+• EMA 21: 3860.77 | EMA 50: 3844.21 | Precio: 3872.20
+  Estado: Precio sobre EMA 21 y EMA 50
+  Cruce: EMA 21 sobre EMA 50 (golden cross)
 
-• RSI 14: 49.12
+• RSI 14: 56.44
   Estado: RSI entre 45-65 (momentum alcista sin sobrecompra)
 
 • Bandas de Bollinger:
-  Superior: 3900.15 | Media: 3805.98 | Inferior: 3711.82
+  Superior: 3887.02 | Media: 3862.06 | Inferior: 3837.09
   Estado: Precio en zona media
 
 • MACD (vela actual en progreso):
-  Línea: -5.7795 | Señal: -14.3289 | Histograma: 8.5494
+  Línea: 10.0852 | Señal: 9.7776 | Histograma: 0.3076
   Estado Línea: MACD línea sobre señal
   Estado Histograma: Histograma decreciente verde
 
 • Volumen:
-  Vela anterior (cerrada): 6,479 | Cambio: -63.16%
-  Vela actual (en progreso): 3,989 | Cambio: -77.32%
-  Volume MA(20): 17,586
+  Vela anterior (cerrada): 5,563 | Cambio: -40.38%
+  Vela actual (en progreso): 2,449 | Cambio: -73.75%
+  Volume MA(20): 9,330
   Estado: Volumen decreciente
 
-• VWAP: 3837.43 | Precio: 3833.78
-  Estado: Precio bajo VWAP
+• VWAP: 3861.73 | Precio: 3872.20
+  Estado: Precio sobre VWAP
+
+• ATR 14: 22.5209
 
 EVALUACIÓN:
-LONG: 1/7 condiciones cumplidas
-  ❌ Precio sobre EMA 21 y EMA 50
-  ❌ EMA 21 sobre EMA 50
+LONG: 4/7 condiciones cumplidas
+  ✅ Precio sobre EMA 21 y EMA 50
+  ✅ EMA 21 sobre EMA 50
   ✅ RSI entre 45-65
   ❌ Precio rebotando BB inferior o rompiendo BB superior
   ❌ MACD línea sobre señal + histograma creciente verde
   ❌ Volumen creciente en velas alcistas
-  ❌ Precio sobre VWAP
+  ✅ Precio sobre VWAP
 
-SHORT: 3/7 condiciones cumplidas
+SHORT: 0/7 condiciones cumplidas
   ❌ Precio bajo EMA 21 y EMA 50
-  ✅ EMA 21 bajo EMA 50
-  ✅ RSI entre 35-55
+  ❌ EMA 21 bajo EMA 50
+  ❌ RSI entre 35-55
   ❌ Precio rechazando BB superior o rompiendo BB inferior
   ❌ MACD línea bajo señal + histograma decreciente rojo
   ❌ Volumen creciente en velas bajistas
-  ✅ Precio bajo VWAP
+  ❌ Precio bajo VWAP
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TIMEFRAME 15MIN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Vela actual: 11:30-11:44 (EN PROGRESO - 2.6% completada)
+Vela actual: 13:15-13:29 (EN PROGRESO - 92.4% completada)
 
 INDICADORES:
-• EMA 21: 3837.31 | EMA 50: 3829.83 | Precio: 3833.78
+• EMA 21: 3872.37 | EMA 50: 3865.38 | Precio: 3872.20
   Estado: Precio entre EMAs
   Cruce: EMA 21 sobre EMA 50 (golden cross)
 
-• RSI 14: 48.71
+• RSI 14: 52.05
   Estado: RSI entre 45-65 (momentum alcista sin sobrecompra)
 
 • Bandas de Bollinger:
-  Superior: 3854.19 | Media: 3837.05 | Inferior: 3819.91
+  Superior: 3881.10 | Media: 3874.75 | Inferior: 3868.39
   Estado: Precio en zona media
 
 • MACD (vela actual en progreso):
-  Línea: 1.2819 | Señal: 3.0793 | Histograma: -1.7975
+  Línea: 3.2846 | Señal: 4.1392 | Histograma: -0.8546
   Estado Línea: MACD línea bajo señal
   Estado Histograma: Histograma decreciente rojo (negativo)
 
 • Volumen:
-  Vela anterior (cerrada): 1,849 | Cambio: -28.49%
-  Vela actual (en progreso): 15 | Cambio: -99.42%
-  Volume MA(20): 2,586
-  Estado: Volumen decreciente
+  Vela anterior (cerrada): 1,285 | Cambio: -16.84%
+  Vela actual (en progreso): 1,164 | Cambio: -24.69%
+  Volume MA(20): 1,546
+  Estado: Volumen normal
 
-• VWAP: 3837.92 | Precio: 3833.78
-  Estado: Precio bajo VWAP
+• VWAP: 3863.19 | Precio: 3872.20
+  Estado: Precio sobre VWAP
+
+• ATR 14: 6.2613
 
 EVALUACIÓN:
-LONG: 2/7 condiciones cumplidas
+LONG: 3/7 condiciones cumplidas
   ❌ Precio sobre EMA 21 y EMA 50
   ✅ EMA 21 sobre EMA 50
   ✅ RSI entre 45-65
   ❌ Precio rebotando BB inferior o rompiendo BB superior
   ❌ MACD línea sobre señal + histograma creciente verde
   ❌ Volumen creciente en velas alcistas
-  ❌ Precio sobre VWAP
+  ✅ Precio sobre VWAP
 
-SHORT: 3/7 condiciones cumplidas
+SHORT: 2/7 condiciones cumplidas
   ❌ Precio bajo EMA 21 y EMA 50
   ❌ EMA 21 bajo EMA 50
   ✅ RSI entre 35-55
   ❌ Precio rechazando BB superior o rompiendo BB inferior
   ✅ MACD línea bajo señal + histograma decreciente rojo
   ❌ Volumen creciente en velas bajistas
-  ✅ Precio bajo VWAP
+  ❌ Precio bajo VWAP
 

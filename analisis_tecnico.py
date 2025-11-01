@@ -64,7 +64,7 @@ class TradingAnalysis:
         except Exception as e:
             print(f"Error guardando estado: {e}")
 
-    def get_klines_dataframe(self, interval: str, limit: int = 200, use_spot: bool = False) -> pd.DataFrame:
+    def get_klines_dataframe(self, interval: str, limit: int = 50, use_spot: bool = False) -> pd.DataFrame:
         """
         Obtiene velas de Binance y las convierte a DataFrame.
 
@@ -88,7 +88,7 @@ class TradingAnalysis:
 
         return df
 
-    def analyze_timeframe(self, interval: str, limit: int = 200) -> dict:
+    def analyze_timeframe(self, interval: str, limit: int = 50) -> dict:
         """
         Analiza un timeframe específico.
         MACD y Volumen se calculan con datos de SPOT, el resto con FUTUROS.
@@ -131,8 +131,8 @@ class TradingAnalysis:
         )
 
         # Evaluar condiciones
-        long_conditions, long_count = self.evaluator.evaluate_long_conditions(indicators, df_futures)
-        short_conditions, short_count = self.evaluator.evaluate_short_conditions(indicators, df_futures)
+        long_conditions, long_count, sl_tp_long = self.evaluator.evaluate_long_conditions(indicators, df_futures)
+        short_conditions, short_count, sl_tp_short = self.evaluator.evaluate_short_conditions(indicators, df_futures)
 
         # Información de la vela actual (usar FUTUROS)
         last_candle = df_futures.iloc[-1]
@@ -157,7 +157,9 @@ class TradingAnalysis:
                 'long_conditions': long_conditions,
                 'long_count': long_count,
                 'short_conditions': short_conditions,
-                'short_count': short_count
+                'short_count': short_count,
+                'sl_tp_long': sl_tp_long,
+                'sl_tp_short': sl_tp_short
             },
             'candle_time': candle_time,
             'candle_completion': candle_completion,
@@ -219,7 +221,7 @@ class TradingAnalysis:
             for interval in ['4h', '1h', '15m']:
                 print(f"  Analizando {interval}...")
                 tf_key = interval.replace('m', 'min')
-                data[tf_key] = self.analyze_timeframe(interval)
+                data[tf_key] = self.analyze_timeframe(interval, limit=50)
 
             # Generar reporte
             print("\n📝 Generando reporte...")
@@ -263,10 +265,13 @@ class TradingAnalysis:
                     'macd_histograma': indicators['macd_histogram'],
                     'volumen': indicators['volume']['current'],
                     'vwap': indicators['vwap'],
+                    'atr': indicators['atr'],
                     'long_count': evaluations['long_count'],
                     'short_count': evaluations['short_count'],
                     'long_conditions': evaluations['long_conditions'],
                     'short_conditions': evaluations['short_conditions'],
+                    'sl_tp_long': evaluations.get('sl_tp_long'),
+                    'sl_tp_short': evaluations.get('sl_tp_short'),
                     'last_candle_open_time': tf_data['candle_open_time'],
                     'last_candle_close_time': tf_data['candle_close_time']
                 }
@@ -402,10 +407,13 @@ class TradingAnalysis:
                     'macd_histograma': indicators['macd_histogram'],
                     'volumen': indicators['volume']['current'],
                     'vwap': indicators['vwap'],
+                    'atr': indicators['atr'],
                     'long_count': evaluations['long_count'],
                     'short_count': evaluations['short_count'],
                     'long_conditions': evaluations['long_conditions'],
                     'short_conditions': evaluations['short_conditions'],
+                    'sl_tp_long': evaluations.get('sl_tp_long'),
+                    'sl_tp_short': evaluations.get('sl_tp_short'),
                     'last_candle_open_time': tf_data['candle_open_time'],
                     'last_candle_close_time': tf_data['candle_close_time']
                 }
@@ -434,7 +442,7 @@ class TradingAnalysis:
             # Analizar 5 minutos
             print("\n📊 Analizando timeframe 5 minutos...")
 
-            analysis = self.analyze_timeframe('5m', limit=100)
+            analysis = self.analyze_timeframe('5m', limit=50)
             df = analysis['raw_df']
 
             # Análisis adicional para 5 minutos
